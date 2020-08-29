@@ -32,17 +32,19 @@ def index():
 '''
 @app.route('/drinks')
 def get_drinks():
-    list_of_drinks = Drink.query.all()
-    drinks = []
-    print(list_of_drinks)
-    for drink in list_of_drinks:
-        drinks.append(drink.short())
-    if len(list_of_drinks) == 0:
-        return abort(404)
-    return jsonify({
-        'success': True,
-        'drinks': drinks
-    })
+    try:
+        list_of_drinks = Drink.query.all()
+        drinks = []
+        for drink in list_of_drinks:
+            drinks.append(drink.short())
+        # if len(list_of_drinks) == 0:
+        #     return abort(404)
+        return jsonify({
+            'success': True,
+            'drinks': drinks
+        })
+    except :
+        return abort(401)
 
 '''
 @TODO implement endpoint
@@ -52,7 +54,22 @@ def get_drinks():
     returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
         or appropriate status code indicating reason for failure
 '''
-
+@app.route('/drinks-detail')
+# @requires_auth('get:drink-details')
+def get_drinks_detail():
+    try:
+        list_of_drinks = Drink.query.all()
+        drinks = []
+        for drink in list_of_drinks:
+            drinks.append(drink.long())
+        # if len(list_of_drinks) == 0:
+        #     return abort(404)
+        return jsonify({
+            'success': True,
+            'drinks': drinks
+        })
+    except:
+        return abort(401)
 '''
 @TODO implement endpoint
     POST /drinks
