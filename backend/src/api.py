@@ -53,8 +53,8 @@ def get_drinks():
         or appropriate status code indicating reason for failure
 '''
 @app.route('/drinks-detail')
-@requires_auth('get:drinks-details')
-def get_drinks_detail():
+@requires_auth('get:drinks-detail')
+def get_drinks_detail(payload):
     try:
         list_of_drinks = Drink.query.all()
         drinks = []
@@ -77,20 +77,20 @@ def get_drinks_detail():
 '''
 @app.route('/drinks', methods=['POST'])
 @requires_auth('post:drinks')
-def post_drink():
+def post_drink(payload):
     body = request.get_json()
     keys = body.keys()
     if 'title' not in keys or 'recipe' not in keys:
         return abort(400)
-    try:
-        drink = Drink(title=body['title'], recipe=json.dumps(body['recipe']))
-        drink.insert()
-        return jsonify({
-            'success': True,
-            'drinks': [drink.long()]
-        })
-    except:
-        return abort(405)
+    # try:
+    drink = Drink(title=body['title'], recipe=json.dumps(body['recipe']))
+    drink.insert()
+    return jsonify({
+        'success': True,
+        'drinks': [drink.long()]
+    })
+    # except:
+    #     return abort(405)
 
 
 '''
@@ -106,7 +106,7 @@ def post_drink():
 '''
 @app.route('/drinks/<int:drink_id>', methods=['PATCH'])
 @requires_auth('patch:drinks')
-def edit_drink(drink_id):
+def edit_drink(payload, drink_id):
     body = request.get_json()
     if len(body.keys()) == 0:
         return abort(400)
@@ -142,7 +142,7 @@ def edit_drink(drink_id):
 '''
 @app.route('/drinks/<int:drink_id>', methods=['DELETE'])
 @requires_auth('delete:drinks')
-def delete_drink(drink_id):
+def delete_drink(payload, drink_id):
     try:
         drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
 
