@@ -55,7 +55,7 @@ def get_drinks():
         or appropriate status code indicating reason for failure
 '''
 @app.route('/drinks-detail')
-# @requires_auth('get:drink-details')
+# @requires_auth('get:drinks-details')
 def get_drinks_detail():
     try:
         list_of_drinks = Drink.query.all()
@@ -79,6 +79,25 @@ def get_drinks_detail():
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the newly created drink
         or appropriate status code indicating reason for failure
 '''
+@app.route('/drinks', methods=['POST'])
+# @requires_auth('post:drinks')
+def post_drinks():
+    print('in the method')
+    body = request.get_json()
+    print('---->', body['recipe'])
+    print('jsonify', jsonify(body['recipe']))
+    try:
+        print('in the try')
+        drink = Drink(title=body['title'], recipe=json.dumps(body['recipe']))
+        print('before insert')
+        drink.insert()
+        print('before return')
+        return jsonify({
+            'success': True,
+            'drinks': [drink.title]
+        })
+    except:
+        return abort(400)
 
 
 '''
