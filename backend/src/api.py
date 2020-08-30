@@ -37,14 +37,12 @@ def get_drinks():
         drinks = []
         for drink in list_of_drinks:
             drinks.append(drink.short())
-        # if len(list_of_drinks) == 0:
-        #     return abort(404)
         return jsonify({
             'success': True,
             'drinks': drinks
         })
     except :
-        return abort(401)
+        return abort(400)
 
 '''
 @TODO implement endpoint
@@ -62,14 +60,12 @@ def get_drinks_detail():
         drinks = []
         for drink in list_of_drinks:
             drinks.append(drink.long())
-        # if len(list_of_drinks) == 0:
-        #     return abort(404)
         return jsonify({
             'success': True,
             'drinks': drinks
         })
     except:
-        return abort(401)
+        return abort(400)
 '''
 @TODO implement endpoint
     POST /drinks
@@ -83,6 +79,9 @@ def get_drinks_detail():
 # @requires_auth('post:drinks')
 def post_drink():
     body = request.get_json()
+    keys = body.keys()
+    if 'title' not in keys or 'recipe' not in keys:
+        return abort(400)
     try:
         drink = Drink(title=body['title'], recipe=json.dumps(body['recipe']))
         drink.insert()
@@ -91,7 +90,7 @@ def post_drink():
             'drinks': [drink.long()]
         })
     except:
-        return abort(400)
+        return abort(405)
 
 
 '''
@@ -113,6 +112,10 @@ def edit_drink(drink_id):
         return abort(400)
     try:
         drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
+
+        if drink == None:
+            return abort(404)
+
         if 'title' in body:
             drink.title = body['title']
         if 'recipe' in body:
@@ -125,7 +128,7 @@ def edit_drink(drink_id):
             'drinks': [drink.long()]
         })
     except:
-        return abort(404)
+        return abort(405)
 
 '''
 @TODO implement endpoint
@@ -155,7 +158,7 @@ def delete_drink(drink_id):
             'delete': deleted_id
         })
     except:
-        return abort(400)
+        return abort(405)
 
 ## Error Handling
 '''
@@ -184,9 +187,55 @@ def unprocessable(error):
 @TODO implement error handler for 404
     error handler should conform to general task above 
 '''
-
+@app.errorhandler(404)
+def not_found(error):
+    return jsonify({
+                    "success": False, 
+                    "error": 404,
+                    "message": "resource not found"
+                    }), 404
 
 '''
 @TODO implement error handler for AuthError
     error handler should conform to general task above 
 '''
+@app.errorhandler(401)
+def unauthorized(error):
+    return jsonify({
+                    "success": False, 
+                    "error": 401,
+                    "message": "unauthorized"
+                    }), 401
+
+@app.errorhandler(400)
+def bad_request(error):
+    return jsonify({
+                    "success": False, 
+                    "error": 400,
+                    "message": "bad request"
+                    }), 400
+
+@app.errorhandler(403)
+def forbidden(error):
+    return jsonify({
+                    "success": False, 
+                    "error": 403,
+                    "message": "forbidden"
+                    }), 403
+
+@app.errorhandler(405)
+def method_not_allowed(error):
+    return jsonify({
+                    "success": False, 
+                    "error": 405,
+                    "message": "method not allowed"
+                    }), 405
+                    
+@app.errorhandler(418)
+def unauthorized(error):
+    return jsonify({
+                    "success": False, 
+                    "error": 418,
+                    "message": "i'm a teapot"
+                    }), 418
+                    
