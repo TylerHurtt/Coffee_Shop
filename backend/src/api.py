@@ -119,7 +119,7 @@ def edit_drink(drink_id):
             drink.recipe = json.dumps(body['recipe'])
 
         drink.update()
-        
+
         return jsonify({
             'success': True,
             'drinks': [drink.long()]
